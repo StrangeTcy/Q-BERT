@@ -22,7 +22,7 @@ import logging
 import math
 import collections
 from io import open
-from tqdm import tqdm
+from tqdm import tqdm, trange
 
 from transformers.tokenization_bert import BasicTokenizer, whitespace_tokenize
 
@@ -206,6 +206,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
     # f = np.zeros((max_N, max_M), dtype=np.float32)
 
     features = []
+    print ("processing examples...")
     for (example_index, example) in tqdm(enumerate(examples)):
 
         # if example_index % 100 == 0:
@@ -261,7 +262,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 break
             start_offset += min(length, doc_stride)
 
-        for (doc_span_index, doc_span) in enumerate(doc_spans):
+        print ("processing doc_spans...")    
+        for (doc_span_index, doc_span) in tqdm(enumerate(doc_spans)):
             tokens = []
             token_to_orig_map = {}
             token_is_max_context = {}
@@ -292,7 +294,8 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 p_mask.append(1)
 
             # Paragraph
-            for i in range(doc_span.length):
+            print ("processing paragraphs...")
+            for i in trange(doc_span.length):
                 split_token_index = doc_span.start + i
                 token_to_orig_map[len(tokens)] = tok_to_orig_index[split_token_index]
 
@@ -318,6 +321,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 p_mask += [1] * len(query_tokens)
 
             # SEP token
+            print ("appending SEP tokens...")
             tokens.append(sep_token)
             segment_ids.append(sequence_b_segment_id)
             p_mask.append(1)
@@ -401,6 +405,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                         "answer: %s" % (answer_text))
             """
 
+            print ("appending stuff to features...")
             features.append(
                 InputFeatures(
                     unique_id=unique_id,
@@ -420,6 +425,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                     is_impossible=span_is_impossible))
             unique_id += 1
 
+    print ("Ok, finally all done, returning features...")        
     return features
 
 
