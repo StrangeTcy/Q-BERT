@@ -207,7 +207,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
 
     features = []
     with open ("last_example_index", "r") as f:
-            lei = f.read(example_index)
+            lei = f.read()
     print (f"processing examples...resuming from {lei}")
     for (example_index, example) in tqdm(enumerate(examples[lei:])):
         print (f"processing example {example_index}")
